@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  database:
+    image: postgres
+    container_name: database_rentalx
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=tests
+      - POSTGRES_PASSWORD=rentalx123
+      - POSTGRES_DB=rentalx
+    volumes:
+      - pgdata:/data/postgres
+
+  app:
+    build: .
+    container_name: rentalx
+    restart: always
+    ports:
+      - 5500:5500
+    volumes:
+      - .:/usr/app
+    links:
+      - database
+    depends_on:
+      - database
+
+
+# mapping volumes
+volumes:
+  pgdata:
+    driver: local
+
+# to init: docker-compose up
+# to init in background: docker-compose up -d
+# network refused error: docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'
+#   or docker exec CONTAINER_NAME cat /etc/hosts
