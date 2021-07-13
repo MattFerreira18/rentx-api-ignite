@@ -46,7 +46,7 @@ class AuthenticateUserUseCase {
     }
 
     // payload - secret phrase (md5) - options
-    const token = jwt.sign({}, 'ooifhhsogh', {
+    const token = jwt.sign({}, process.env.SECRET_KEY, {
       subject: user.id,
       expiresIn: '1d',
     });

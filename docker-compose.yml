@@ -3,20 +3,20 @@ version: "3.9"
 services:
   database:
     image: postgres
-    container_name: database_rentalx
+    container_name: database_rentx
     restart: always
     ports:
       - 5432:5432
     environment:
       - POSTGRES_USER=tests
-      - POSTGRES_PASSWORD=rentalx123
-      - POSTGRES_DB=rentalx
+      - POSTGRES_PASSWORD=rentx123
+      - POSTGRES_DB=rentx
     volumes:
       - pgdata:/data/postgres
 
   app:
     build: .
-    container_name: rentalx
+    container_name: rentx
     restart: always
     ports:
       - 5500:5500

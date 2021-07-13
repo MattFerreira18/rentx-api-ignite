@@ -18,9 +18,9 @@ EXPOSE 5500
 CMD ["npm", "run", "dev:server"]
 
 # command to inicialize docker build
-# docker build -t rentalx .
+# docker build -t rentx .
 
-# docker run -p 5500:5500 rentalx
+# docker run -p 5500:5500 rentx
 
 # open container terminal
 # docker exect -it CONTAINER_NAME /bin/bash

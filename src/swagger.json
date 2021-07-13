@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "RentalX Documentation",
+    "title": "RentX Documentation",
     "description": "a API Rest developed in RocketSeat Ignite on the Node.JS trail",
     "version": "1.1.0",
     "contact": {

@@ -19,12 +19,12 @@ describe.skip('list categories', () => {
 
     await connection.query(
       `INSERT INTO USERS(id, name, email, driver_license, password, "isAdmin", created_at)
-      values('${uuid()}', 'admin', 'admin@rentalx.com', 'XXX-XXX-XXX.XX', '${password}', true, 'now()')
+      values('${uuid()}', 'admin', 'admin@rentx.com', 'XXX-XXX-XXX.XX', '${password}', true, 'now()')
       `,
     );
 
     const response = await request(app).post('/auth').send({
-      email: 'admin@rentalx.com',
+      email: 'admin@rentx.com',
       password: 'admin',
     });
 
