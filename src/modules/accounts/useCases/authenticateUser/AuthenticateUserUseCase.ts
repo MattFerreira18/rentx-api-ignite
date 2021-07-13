@@ -1,8 +1,7 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { inject, injectable } from 'tsyringe';
 
 import { AppError } from '@errors/AppError';
+import { IEncryptsProvider } from '@providers/encryptsProviders/IEncryptsProvider';
 import { ITokenProvider } from '@providers/tokenProvider/ITokenProvider';
 
 import { IUsersRepository } from '../../repositories/IUsersRepository';
@@ -27,6 +26,8 @@ class AuthenticateUserUseCase {
     private usersRepository: IUsersRepository,
     @inject('TokenProvider')
     private tokenProvider: ITokenProvider,
+    @inject('EncryptsProvider')
+    private encryptsProvider: IEncryptsProvider,
   ) {}
 
   async execute({ email, password }: IRequest): Promise<IResponse> {
@@ -39,7 +40,7 @@ class AuthenticateUserUseCase {
       });
     }
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    const passwordMatch = await this.encryptsProvider.compare(password, user.password);
 
     if (!passwordMatch) {
       throw new AppError({
