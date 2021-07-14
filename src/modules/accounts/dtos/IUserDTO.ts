@@ -5,4 +5,12 @@ interface ICreateUserDTO {
   password: string;
 }
 
-export { ICreateUserDTO };
+interface IListUserDTO {
+  id: string;
+  name: string;
+  email: string;
+  driverLicense: string;
+  isAdmin: boolean;
+}
+
+export { ICreateUserDTO, IListUserDTO };

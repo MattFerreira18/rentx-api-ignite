@@ -27,6 +27,8 @@ class CreateUserUseCase {
       throw new AppError({ statusCode: 409, message: 'user already exists' });
     }
 
+    // verify duplicate driver license
+
     const passwordHash = await this.encryptsProvider.hash(password);
 
     await this.usersRepository.create({

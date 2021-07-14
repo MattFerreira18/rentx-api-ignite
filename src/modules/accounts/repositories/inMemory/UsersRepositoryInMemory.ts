@@ -13,7 +13,9 @@ export class UsersRepositoryInMemory implements IUsersRepository {
     this.repository.push(user);
   }
   async update(id: string, user: User): Promise<void> {
-    throw new Error('Method not implemented.');
+    const userIndex = this.repository.findIndex((aUser) => aUser.id === id);
+
+    this.repository[userIndex] = user;
   }
   async findByEmail(email: string): Promise<User> {
     return this.repository.find((user) => user.email === email);

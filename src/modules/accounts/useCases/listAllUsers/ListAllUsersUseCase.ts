@@ -1,16 +1,8 @@
 import { inject, injectable } from 'tsyringe';
 
-import User from '../../infra/database/entities/User';
+import { IListUserDTO } from '../../dtos/IUserDTO';
+import { UserMapper } from '../../mappers/UserMapper';
 import { IUsersRepository } from '../../repositories/IUsersRepository';
-
-// interface IUserWithoutPassword {
-//   id: string;
-//   name: string;
-//   email: string;
-//   driverLicense: string;
-//   isAdmin: boolean;
-//   createdAt: Date;
-// }
 
 @injectable()
 class ListAllUsersUseCase {
@@ -19,10 +11,16 @@ class ListAllUsersUseCase {
     private usersRepository: IUsersRepository,
   ) {}
 
-  async execute(): Promise<User[]> {
+  async execute(): Promise<IListUserDTO[]> {
     const users = await this.usersRepository.listAll();
 
-    return users;
+    const clrUsers: IListUserDTO[] = [];
+
+    users.forEach((user) => {
+      clrUsers.push(UserMapper.toDTO(user));
+    });
+
+    return clrUsers;
   }
 }
 
