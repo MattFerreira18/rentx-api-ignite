@@ -1,9 +1,11 @@
 import { inject, injectable } from 'tsyringe';
 
-import { AppError } from '@errors/AppError';
 import { IDateProvider } from '@providers/dateProvider/IDateProvider';
 
 import { ICarsRepository } from '../../../cars/repositories/ICarsRepository';
+import { CarAlreadyReturned } from '../../errors/CarAlreadyReturned';
+import { InvalidUser } from '../../errors/InvalidUser';
+import { RentalNotFound } from '../../errors/RentalNotFound';
 import { Rental } from '../../infra/database/entities/Rental';
 import { IRentalsRepository } from '../../repositories/IRentalsRepository';
 
@@ -29,24 +31,15 @@ export class DevolutionRentalUseCase {
     const rental = await this.rentalsRepository.findById(rentalId);
 
     if (!rental) {
-      throw new AppError({
-        statusCode: 404,
-        message: 'rental does not exists',
-      });
+      throw new RentalNotFound();
     }
 
     if (rental.userId !== userId) {
-      throw new AppError({
-        statusCode: 409,
-        message: 'invalid user',
-      });
+      throw new InvalidUser();
     }
 
     if (rental.endDate) {
-      throw new AppError({
-        statusCode: 400,
-        message: 'car already returned',
-      });
+      throw new CarAlreadyReturned();
     }
 
     let daily = this.dateProvider.compareInDays(

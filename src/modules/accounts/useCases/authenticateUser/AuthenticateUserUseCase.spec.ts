@@ -1,10 +1,10 @@
 import { mock } from 'jest-mock-extended';
 
-import { AppError } from '@errors/AppError';
 import { IEncryptsProvider } from '@providers/encryptsProviders/IEncryptsProvider';
 import { ITokenProvider } from '@providers/tokenProvider/ITokenProvider';
 
 import { ICreateUserDTO } from '../../dtos/IUserDTO';
+import { IncorrectEmailOrPassword } from '../../errors/IncorrectEmailOrPassword';
 import { UsersRepositoryInMemory } from '../../repositories/inMemory/UsersRepositoryInMemory';
 import { IUsersRepository } from '../../repositories/IUsersRepository';
 import { AuthenticateUserUseCase } from './AuthenticateUserUseCase';
@@ -92,7 +92,7 @@ describe('Authenticate User', () => {
         email: 'email@email.com',
         password: '123456',
       });
-    }).rejects.toBeInstanceOf(AppError);
+    }).rejects.toBeInstanceOf(IncorrectEmailOrPassword);
   });
 
   it('Should not be able to authenticate a user with incorrect password', () => {
@@ -103,6 +103,6 @@ describe('Authenticate User', () => {
         email: data.email,
         password: '010101',
       });
-    }).rejects.toBeInstanceOf(AppError);
+    }).rejects.toBeInstanceOf(IncorrectEmailOrPassword);
   });
 });

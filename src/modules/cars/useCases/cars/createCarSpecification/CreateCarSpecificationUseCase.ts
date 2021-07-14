@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 
-import { AppError } from '@errors/AppError';
+import { CarNotFound } from '@src/modules/cars/errors/CarNotFound';
+import { SpecificationNotSended } from '@src/modules/cars/errors/SpecificationNotSended';
 
 import { ICarsRepository } from '../../../repositories/ICarsRepository';
 import { ISpecificationsRepository } from '../../../repositories/ISpecificationsRepository';
@@ -23,14 +24,11 @@ export class CreateCarSpecificationUseCase {
     const carExists = await this.carsRepository.findById(carId);
 
     if (!carExists) {
-      throw new AppError({ statusCode: 404, message: 'car does not exits' });
+      throw new CarNotFound();
     }
 
     if (specificationsId.length === 0) {
-      throw new AppError({
-        statusCode: 404,
-        message: 'specifications id not sended',
-      });
+      throw new SpecificationNotSended();
     }
 
     const specifications = await this.specificationsRepository.findByIds(

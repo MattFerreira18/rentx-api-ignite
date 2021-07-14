@@ -1,4 +1,4 @@
-import { AppError } from '@errors/AppError';
+import { CarAlreadyExists } from '@src/modules/cars/errors/CarAlreadyExists';
 
 import { ICarsRepository } from '../../../repositories/ICarsRepository';
 import { CarsRepositoryInMemory } from '../../../repositories/InMemory/CarsRepositoryInMemory';
@@ -44,7 +44,7 @@ describe('create car', () => {
 
     expect(async () => {
       await createCarUseCase.execute(data2);
-    }).rejects.toBeInstanceOf(AppError);
+    }).rejects.toBeInstanceOf(CarAlreadyExists);
   });
 
   it('Should be able to create a new car with available true by default', async () => {

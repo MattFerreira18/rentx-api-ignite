@@ -1,4 +1,4 @@
-import { AppError } from '@errors/AppError';
+import { CategoryAlreadyExists } from '@src/modules/cars/errors/CategoryAlreadyExists';
 
 import { ICreateCategoryDTO } from '../../../dtos/ICategoryDTO';
 import { ICategoriesRepository } from '../../../repositories/ICategoriesRepository';
@@ -41,24 +41,6 @@ describe('Create Category', () => {
 
     expect(async () => {
       await createCategoryUseCase.execute(category);
-    }).rejects.toBeInstanceOf(AppError);
-  });
-
-  it('Should not be able to create a new category with undefined name property', async () => {
-    expect(async () => {
-      await createCategoryUseCase.execute({
-        name: undefined,
-        description: 'a example of category description',
-      });
-    }).rejects.toBeInstanceOf(AppError);
-  });
-
-  it('Should not be able to create a new category with undefined description property', async () => {
-    expect(async () => {
-      await createCategoryUseCase.execute({
-        name: 'category test',
-        description: undefined,
-      });
-    }).rejects.toBeInstanceOf(AppError);
+    }).rejects.toBeInstanceOf(CategoryAlreadyExists);
   });
 });

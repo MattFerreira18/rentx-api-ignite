@@ -1,13 +1,16 @@
 import { mock } from 'jest-mock-extended';
 import { v4 as uuid } from 'uuid';
 
-import { AppError } from '@errors/AppError';
 import { UsersRepositoryInMemory } from '@modules/accounts/repositories/inMemory/UsersRepositoryInMemory';
 import { IUsersRepository } from '@modules/accounts/repositories/IUsersRepository';
 import { ICarsRepository } from '@modules/cars/repositories/ICarsRepository';
 import { CarsRepositoryInMemory } from '@modules/cars/repositories/InMemory/CarsRepositoryInMemory';
 import { IDateProvider } from '@providers/dateProvider/IDateProvider';
 
+import { AlreadyRentalInProgress } from '../../errors/AlreadyRentalInProgress';
+import { CarNotFound } from '../../errors/CarNotFound';
+import { InvalidReturnTime } from '../../errors/InvalidReturnTime';
+import { UnavailableCar } from '../../errors/UnavailableCar';
 import { RentalsRepositoryInMemory } from '../../repositories/InMemory/RentalsRepositoryInMemory';
 import { IRentalsRepository } from '../../repositories/IRentalsRepository';
 import { CreateRentalUseCase } from './CreateRentalUseCase';
@@ -92,7 +95,7 @@ describe('create rental use case', () => {
         carId,
         expectedReturnDate: new Date(),
       });
-    }).rejects.toBeInstanceOf(AppError);
+    }).rejects.toBeInstanceOf(UnavailableCar);
   });
 
   it('Should not be able to create a rental with unavailable user', async () => {
@@ -120,7 +123,7 @@ describe('create rental use case', () => {
         carId: car[0].id,
         expectedReturnDate: new Date(),
       });
-    }).rejects.toBeInstanceOf(AppError);
+    }).rejects.toBeInstanceOf(AlreadyRentalInProgress);
   });
 
   it('Should not create a rental with a nonexisting car', () => {
@@ -130,7 +133,7 @@ describe('create rental use case', () => {
         carId: uuid(),
         expectedReturnDate: new Date(),
       });
-    }).rejects.toBeInstanceOf(AppError);
+    }).rejects.toBeInstanceOf(CarNotFound);
   });
 
   it('Should not be able to create a rental with invalid date', () => {
@@ -142,6 +145,6 @@ describe('create rental use case', () => {
         carId,
         expectedReturnDate: new Date(),
       });
-    }).rejects.toBeInstanceOf(AppError);
+    }).rejects.toBeInstanceOf(InvalidReturnTime);
   });
 });

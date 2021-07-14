@@ -3,6 +3,7 @@ import { inject, injectable } from 'tsyringe';
 import { AppError } from '@errors/AppError';
 
 import { deleteFile } from '../../../../utils/file';
+import { UserNotFound } from '../../errors/UserNotFound';
 import { IUsersRepository } from '../../repositories/IUsersRepository';
 
 interface IRequest {
@@ -21,7 +22,7 @@ class UpdateUserAvatarUseCase {
     const user = await this.usersRepository.findById(userId);
 
     if (!user) {
-      throw new AppError({ statusCode: 404, message: 'user not found' });
+      throw new UserNotFound();
     }
 
     if (user.avatar) {

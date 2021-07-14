@@ -2,9 +2,12 @@ import { inject, injectable } from 'tsyringe';
 
 import { AppError } from '@errors/AppError';
 import { IDateProvider } from '@providers/dateProvider/IDateProvider';
-import { IUsersRepository } from '@src/modules/accounts/repositories/IUsersRepository';
 
 import { ICarsRepository } from '../../../cars/repositories/ICarsRepository';
+import { AlreadyRentalInProgress } from '../../errors/AlreadyRentalInProgress';
+import { CarNotFound } from '../../errors/CarNotFound';
+import { InvalidReturnTime } from '../../errors/InvalidReturnTime';
+import { UnavailableCar } from '../../errors/UnavailableCar';
 import { Rental } from '../../infra/database/entities/Rental';
 import { IRentalsRepository } from '../../repositories/IRentalsRepository';
 
@@ -33,7 +36,7 @@ export class CreateRentalUseCase {
     const carExists = await this.carsRepository.findById(carId);
 
     if (!carExists) {
-      throw new AppError({ statusCode: 404, message: 'car not found' });
+      throw new CarNotFound();
     }
 
     const availableCar = await this.rentalsRepository.findOpenRentalByCarId(
@@ -41,16 +44,13 @@ export class CreateRentalUseCase {
     );
 
     if (availableCar) {
-      throw new AppError({ statusCode: 409, message: 'car is unavailable' });
+      throw new UnavailableCar();
     }
 
     const user = await this.rentalsRepository.findOpenRentalByUserId(userId);
 
     if (user) {
-      throw new AppError({
-        statusCode: 409,
-        message: "there's a rental in progress for user",
-      });
+      throw new AlreadyRentalInProgress();
     }
 
     const compareDate = this.dateProvider.compareInHours({
@@ -59,7 +59,7 @@ export class CreateRentalUseCase {
 
     // compare the date with a minimum of a day (24 hours)
     if (compareDate < 24) {
-      throw new AppError({ statusCode: 400, message: 'invalid return time' });
+      throw new InvalidReturnTime();
     }
 
     const rental = await this.rentalsRepository.create({

@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 
-import { AppError } from '@errors/AppError';
+import { CategoryAlreadyExists } from '@src/modules/cars/errors/CategoryAlreadyExists';
 
 import { ICreateCategoryDTO } from '../../../dtos/ICategoryDTO';
 import { ICategoriesRepository } from '../../../repositories/ICategoriesRepository';
@@ -17,18 +17,8 @@ class CreateCategoryUseCase {
       name,
     );
 
-    if (!name || !description) {
-      throw new AppError({
-        statusCode: 400,
-        message: 'name or description undefined',
-      });
-    }
-
     if (categoryAlreadyExists) {
-      throw new AppError({
-        statusCode: 409,
-        message: 'category already exists',
-      });
+      throw new CategoryAlreadyExists();
     }
 
     this.categoriesRepository.create({ name, description });

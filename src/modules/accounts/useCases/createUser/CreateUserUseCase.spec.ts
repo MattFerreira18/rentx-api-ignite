@@ -1,9 +1,9 @@
 import { mock } from 'jest-mock-extended';
 
-import { AppError } from '@errors/AppError';
 import { IEncryptsProvider } from '@providers/encryptsProviders/IEncryptsProvider';
 
 import { ICreateUserDTO } from '../../dtos/IUserDTO';
+import { UserAlreadyExists } from '../../errors/UserAlreadyExists';
 import { UsersRepositoryInMemory } from '../../repositories/inMemory/UsersRepositoryInMemory';
 import { IUsersRepository } from '../../repositories/IUsersRepository';
 import { CreateUserUseCase } from './CreateUserUseCase';
@@ -53,6 +53,6 @@ describe('create user use case', () => {
 
     expect(async () => {
       await createUserUseCase.execute(data);
-    }).rejects.toBeInstanceOf(AppError);
+    }).rejects.toBeInstanceOf(UserAlreadyExists);
   });
 });

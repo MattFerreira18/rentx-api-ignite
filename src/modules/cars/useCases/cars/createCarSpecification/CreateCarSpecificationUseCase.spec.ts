@@ -1,6 +1,7 @@
 import { v4 as uuid } from 'uuid';
 
-import { AppError } from '@errors/AppError';
+import { CarNotFound } from '@src/modules/cars/errors/CarNotFound';
+import { SpecificationNotSended } from '@src/modules/cars/errors/SpecificationNotSended';
 
 import { ICreateCarDTO } from '../../../dtos/ICarDTO';
 import { ICarsRepository } from '../../../repositories/ICarsRepository';
@@ -66,7 +67,7 @@ describe('create car specification', () => {
         carId: uuid(),
         specificationsId: [specificationId],
       });
-    }).rejects.toBeInstanceOf(AppError);
+    }).rejects.toBeInstanceOf(CarNotFound);
   });
 
   it('Should not be able to add a new car specification with a empty specificationsId', () => {
@@ -75,6 +76,6 @@ describe('create car specification', () => {
         carId,
         specificationsId: [],
       });
-    }).rejects.toBeInstanceOf(AppError);
+    }).rejects.toBeInstanceOf(SpecificationNotSended);
   });
 });

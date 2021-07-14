@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 
-import { AppError } from '@errors/AppError';
+import { SpecificationAlreadyExists } from '@src/modules/cars/errors/SpecificationAlreadyExists';
 
 import { ICreateSpecificationDTO } from '../../../dtos/ISpecificationDTO';
 import { ISpecificationsRepository } from '../../../repositories/ISpecificationsRepository';
@@ -16,10 +16,7 @@ class CreateSpecificationUseCase {
     const specificationAlreadyExists = await this.specificationRepository.findByName(name);
 
     if (specificationAlreadyExists) {
-      throw new AppError({
-        statusCode: 409,
-        message: 'specification already exists',
-      });
+      throw new SpecificationAlreadyExists();
     }
 
     await this.specificationRepository.create({ name, description });

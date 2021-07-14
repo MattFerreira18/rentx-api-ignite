@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 
-import { AppError } from '@errors/AppError';
+import { CarAlreadyExists } from '@src/modules/cars/errors/CarAlreadyExists';
 
 import { ICreateCarDTO } from '../../../dtos/ICarDTO';
 import Car from '../../../infra/database/entities/Car';
@@ -28,10 +28,7 @@ export class CreateCarUseCase {
     );
 
     if (carAlreadyExists) {
-      throw new AppError({
-        statusCode: 400,
-        message: 'car already exists',
-      });
+      throw new CarAlreadyExists();
     }
 
     const car = await this.carsRepository.create({

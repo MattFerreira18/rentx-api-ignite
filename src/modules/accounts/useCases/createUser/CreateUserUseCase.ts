@@ -4,6 +4,7 @@ import { AppError } from '@errors/AppError';
 import { IEncryptsProvider } from '@providers/encryptsProviders/IEncryptsProvider';
 
 import { ICreateUserDTO } from '../../dtos/IUserDTO';
+import { UserAlreadyExists } from '../../errors/UserAlreadyExists';
 import { IUsersRepository } from '../../repositories/IUsersRepository';
 
 @injectable()
@@ -24,7 +25,7 @@ class CreateUserUseCase {
     const emailAlreadyExists = await this.usersRepository.findByEmail(email);
 
     if (emailAlreadyExists) {
-      throw new AppError({ statusCode: 409, message: 'user already exists' });
+      throw new UserAlreadyExists();
     }
 
     // verify duplicate driver license

@@ -3,9 +3,11 @@ import { v4 as uuid } from 'uuid';
 
 import { ICarsRepository } from '@src/modules/cars/repositories/ICarsRepository';
 import { CarsRepositoryInMemory } from '@src/modules/cars/repositories/InMemory/CarsRepositoryInMemory';
-import { AppError } from '@src/shared/errors/AppError';
 import { IDateProvider } from '@src/shared/providers/dateProvider/IDateProvider';
 
+import { CarAlreadyReturned } from '../../errors/CarAlreadyReturned';
+import { InvalidUser } from '../../errors/InvalidUser';
+import { RentalNotFound } from '../../errors/RentalNotFound';
 import { RentalsRepositoryInMemory } from '../../repositories/InMemory/RentalsRepositoryInMemory';
 import { IRentalsRepository } from '../../repositories/IRentalsRepository';
 import { DevolutionRentalUseCase } from './DevolutionRentalUseCase';
@@ -110,18 +112,18 @@ describe('devolution rental use case', () => {
 
     expect(async () => {
       await devolutionRentalUseCase.execute({ rentalId, userId });
-    }).rejects.toBeInstanceOf(AppError);
+    }).rejects.toBeInstanceOf(CarAlreadyReturned);
   });
 
   it('Should not be able to realize the devolution with a nonexisting rental', () => {
     expect(async () => {
       await devolutionRentalUseCase.execute({ rentalId: uuid(), userId });
-    }).rejects.toBeInstanceOf(AppError);
+    }).rejects.toBeInstanceOf(RentalNotFound);
   });
 
   it('Should not be able to realize the devolution of a rental with a another user', () => {
     expect(async () => {
       await devolutionRentalUseCase.execute({ rentalId, userId: uuid() });
-    }).rejects.toBeInstanceOf(AppError);
+    }).rejects.toBeInstanceOf(InvalidUser);
   });
 });

@@ -1,7 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
-import { AppError } from '@errors/AppError';
-
+import { UserNotFound } from '../../errors/UserNotFound';
 import { UsersRepositoryInMemory } from '../../repositories/inMemory/UsersRepositoryInMemory';
 import { IUsersRepository } from '../../repositories/IUsersRepository';
 import { UpdateUserAvatarUseCase } from './UpdateUserAvatarUseCase';
@@ -40,6 +39,6 @@ describe('update user avatar use case', () => {
   it('Should not be able to update the avatar of a nonexisting user', () => {
     expect(async () => {
       await updateUserAvatarUseCase.execute({ userId: uuid(), avatarFile });
-    }).rejects.toBeInstanceOf(AppError);
+    }).rejects.toBeInstanceOf(UserNotFound);
   });
 });
