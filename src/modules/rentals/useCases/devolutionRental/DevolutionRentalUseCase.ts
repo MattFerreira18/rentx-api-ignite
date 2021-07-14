@@ -27,12 +27,18 @@ export class DevolutionRentalUseCase {
     const minimumDaily = 1;
 
     const rental = await this.rentalsRepository.findById(rentalId);
-    const car = await this.carsRepository.findById(rental.carId);
 
     if (!rental) {
       throw new AppError({
         statusCode: 404,
         message: 'rental does not exists',
+      });
+    }
+
+    if (rental.userId !== userId) {
+      throw new AppError({
+        statusCode: 409,
+        message: 'invalid user',
       });
     }
 
@@ -58,6 +64,8 @@ export class DevolutionRentalUseCase {
     );
 
     let total = 0;
+
+    const car = await this.carsRepository.findById(rental.carId);
 
     if (delay > 0) {
       const calculateFine = delay * car.fineAmount;

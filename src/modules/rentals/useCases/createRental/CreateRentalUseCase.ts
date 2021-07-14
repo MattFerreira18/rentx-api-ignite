@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { AppError } from '@errors/AppError';
 import { IDateProvider } from '@providers/dateProvider/IDateProvider';
+import { IUsersRepository } from '@src/modules/accounts/repositories/IUsersRepository';
 
 import { ICarsRepository } from '../../../cars/repositories/ICarsRepository';
 import { Rental } from '../../infra/database/entities/Rental';
@@ -18,10 +19,10 @@ export class CreateRentalUseCase {
   constructor(
     @inject('RentalsRepository')
     private rentalsRepository: IRentalsRepository,
-    @inject('DateProvider')
-    private dateProvider: IDateProvider,
     @inject('CarsRepository')
     private carsRepository: ICarsRepository,
+    @inject('DateProvider')
+    private dateProvider: IDateProvider,
   ) {}
 
   async execute({
@@ -29,12 +30,18 @@ export class CreateRentalUseCase {
     carId,
     expectedReturnDate,
   }: IRequest): Promise<Rental> {
+    const carExists = await this.carsRepository.findById(carId);
+
+    if (!carExists) {
+      throw new AppError({ statusCode: 404, message: 'car not found' });
+    }
+
     const availableCar = await this.rentalsRepository.findOpenRentalByCarId(
       carId,
     );
 
     if (availableCar) {
-      throw new AppError({ statusCode: 404, message: 'car is unavailable' });
+      throw new AppError({ statusCode: 409, message: 'car is unavailable' });
     }
 
     const user = await this.rentalsRepository.findOpenRentalByUserId(userId);

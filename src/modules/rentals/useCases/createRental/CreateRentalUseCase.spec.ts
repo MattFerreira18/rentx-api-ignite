@@ -1,33 +1,43 @@
-import dayjs from 'dayjs';
 import { mock } from 'jest-mock-extended';
+import { v4 as uuid } from 'uuid';
 
 import { AppError } from '@errors/AppError';
+import { UsersRepositoryInMemory } from '@modules/accounts/repositories/inMemory/UsersRepositoryInMemory';
+import { IUsersRepository } from '@modules/accounts/repositories/IUsersRepository';
+import { ICarsRepository } from '@modules/cars/repositories/ICarsRepository';
+import { CarsRepositoryInMemory } from '@modules/cars/repositories/InMemory/CarsRepositoryInMemory';
 import { IDateProvider } from '@providers/dateProvider/IDateProvider';
 
-import { CarsRepository } from '../../../cars/infra/database/repositories/CarsRepository';
-import { ICarsRepository } from '../../../cars/repositories/ICarsRepository';
 import { RentalsRepositoryInMemory } from '../../repositories/InMemory/RentalsRepositoryInMemory';
 import { IRentalsRepository } from '../../repositories/IRentalsRepository';
 import { CreateRentalUseCase } from './CreateRentalUseCase';
 
-describe('create rental', () => {
+describe('create rental use case', () => {
   let rentalsRepository: IRentalsRepository;
-  let createRentalUseCase: CreateRentalUseCase;
   let carsRepository: ICarsRepository;
+  let usersRepository: IUsersRepository;
+  let createRentalUseCase: CreateRentalUseCase;
   let carId: string;
+  let userId: string;
 
-  const add24Hours = dayjs().add(1, 'day').toDate();
-
-  const dayJsProvider = mock<IDateProvider>();
+  const dateProviderMock = mock<IDateProvider>();
 
   beforeEach(async () => {
     rentalsRepository = new RentalsRepositoryInMemory();
-    carsRepository = new CarsRepository();
+    carsRepository = new CarsRepositoryInMemory();
+    usersRepository = new UsersRepositoryInMemory();
     createRentalUseCase = new CreateRentalUseCase(
       rentalsRepository,
-      dayJsProvider,
       carsRepository,
+      dateProviderMock,
     );
+
+    await usersRepository.create({
+      name: 'Matheus',
+      email: 'matheus@email.com',
+      driverLicense: '123456',
+      password: '123456789',
+    });
 
     await carsRepository.create({
       name: 'name car',
@@ -39,73 +49,98 @@ describe('create rental', () => {
       categoryId: 'category',
     });
 
-    const car = await carsRepository.findByLicensePlate('ABC-1234');
+    const user = await usersRepository.findByEmail('matheus@email.com');
+    const car = await carsRepository.findAvailable();
 
-    carId = car.id;
+    userId = user.id;
+    carId = car[0].id;
   });
 
-  it.only('Should be able to rental a existing car', async () => {
-    console.log(carId);
-    const rental = await createRentalUseCase.execute({
-      userId: '123',
+  it('Should be able to create a new rental', async () => {
+    dateProviderMock.compareInHours.mockReturnValue(150);
+
+    await createRentalUseCase.execute({
+      userId,
       carId,
-      expectedReturnDate: add24Hours,
+      expectedReturnDate: new Date(),
     });
 
-    expect(rental).toHaveProperty('id');
-    expect(rental).toHaveProperty('startDate');
+    const rental = await rentalsRepository.findByUserId(userId);
+
+    expect(rental[0]).toHaveProperty('id');
   });
 
-  it("Should not be able to rental a car if there's another open to the same car", async () => {
+  it('Should not be able to create a rental with unavailable car', async () => {
+    await usersRepository.create({
+      name: 'Rafael',
+      email: 'rafael@email.com',
+      driverLicense: '7891048',
+      password: '123456789',
+    });
+
+    const user = await usersRepository.findByEmail('rafael@email.com');
+
     await createRentalUseCase.execute({
-      userId: '123',
+      userId,
       carId,
-      expectedReturnDate: add24Hours,
+      expectedReturnDate: new Date(),
     });
 
     expect(async () => {
       await createRentalUseCase.execute({
-        userId: '456',
+        userId: user.id,
         carId,
-        expectedReturnDate: add24Hours,
+        expectedReturnDate: new Date(),
       });
     }).rejects.toBeInstanceOf(AppError);
   });
 
-  it('Should update car availability', async () => {
+  it('Should not be able to create a rental with unavailable user', async () => {
     await createRentalUseCase.execute({
-      userId: '123',
+      userId,
       carId,
-      expectedReturnDate: add24Hours,
+      expectedReturnDate: new Date(),
     });
 
-    const car = await carsRepository.findById(carId);
-
-    expect(car.available).toBe(false);
-  });
-
-  it("Should not be able to rental a car if there's another open to the same user", async () => {
-    await createRentalUseCase.execute({
-      userId: '123',
-      carId,
-      expectedReturnDate: add24Hours,
+    await carsRepository.create({
+      name: 'name car 2',
+      description: 'description car',
+      dailyRate: 100,
+      licensePlate: 'CDV-1234',
+      fineAmount: 100,
+      brand: 'brand2',
+      categoryId: 'category2',
     });
+
+    const car = await carsRepository.findAvailableByOptions({ name: 'name car 2' });
 
     expect(async () => {
       await createRentalUseCase.execute({
-        userId: '123',
-        carId: '456',
-        expectedReturnDate: add24Hours,
+        userId,
+        carId: car[0].id,
+        expectedReturnDate: new Date(),
       });
     }).rejects.toBeInstanceOf(AppError);
   });
 
-  it('Should not be able to rental a existing car with invalid return time', () => {
+  it('Should not create a rental with a nonexisting car', () => {
     expect(async () => {
       await createRentalUseCase.execute({
-        userId: '123',
+        userId,
+        carId: uuid(),
+        expectedReturnDate: new Date(),
+      });
+    }).rejects.toBeInstanceOf(AppError);
+  });
+
+  it('Should not be able to create a rental with invalid date', () => {
+    dateProviderMock.compareInHours.mockReturnValue(10);
+
+    expect(async () => {
+      await createRentalUseCase.execute({
+        userId,
         carId,
-        expectedReturnDate: dayjs().toDate(),
+        expectedReturnDate: new Date(),
       });
     }).rejects.toBeInstanceOf(AppError);
   });

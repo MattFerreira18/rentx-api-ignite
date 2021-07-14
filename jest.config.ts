@@ -1,5 +1,5 @@
 export default {
-  bail: true,
+  bail: false,
   clearMocks: true,
   coverageProvider: 'v8',
   preset: 'ts-jest',
