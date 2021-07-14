@@ -6,7 +6,7 @@ export default {
   testMatch: ['**/*.spec.ts', '**/*.test.ts'],
   moduleNameMapper: {
     '@src/(.*)': ['<rootDir>/src/$1'],
-    '@configs/(.*)': ['<rootDir>/configs/$1'],
+    '@configs/(.*)': ['<rootDir>/src/configs/$1'],
     '@utils/(.*)': ['<rootDir>/src/utils/$1'],
     '@modules/(.*)': ['<rootDir>/src/modules/$1'],
     '@shared/(.*)': ['<rootDir>/src/shared/$1'],

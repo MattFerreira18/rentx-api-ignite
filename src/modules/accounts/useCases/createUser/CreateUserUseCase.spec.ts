@@ -52,7 +52,7 @@ describe('create user use case', () => {
     await createUserUseCase.execute(data);
 
     expect(async () => {
-      await usersRepository.create(data);
+      await createUserUseCase.execute(data);
     }).rejects.toBeInstanceOf(AppError);
   });
 });

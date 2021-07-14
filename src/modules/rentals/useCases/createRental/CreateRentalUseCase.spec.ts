@@ -21,7 +21,6 @@ describe('create rental', () => {
   const dayJsProvider = mock<IDateProvider>();
 
   beforeEach(async () => {
-    console.log('test1');
     rentalsRepository = new RentalsRepositoryInMemory();
     carsRepository = new CarsRepository();
     createRentalUseCase = new CreateRentalUseCase(
@@ -30,7 +29,6 @@ describe('create rental', () => {
       carsRepository,
     );
 
-    console.log('test2');
     await carsRepository.create({
       name: 'name car',
       description: 'description car',
