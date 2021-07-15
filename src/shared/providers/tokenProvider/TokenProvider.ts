@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import authConfig from '@configs/auth';
 import { AppError } from '@src/shared/errors/AppError';
 
-import { ITokenProvider } from './ITokenProvider';
+import { ICreateToken, ITokenProvider } from './ITokenProvider';
 
 interface ITokenPayload {
   iat: string;
@@ -12,8 +12,11 @@ interface ITokenPayload {
 }
 
 export class TokenProvider implements ITokenProvider {
-  createHash(data: string, expiresIn?: string): string {
-    const token = jwt.sign({ sub: data ?? authConfig.public_token }, authConfig.secret_token, {
+  createHash({ data, isRefreshToken, expiresIn }: ICreateToken): string {
+    const token = jwt.sign({ sub: data }, (
+      isRefreshToken
+        ? authConfig.public_token
+        : authConfig.secret_token), {
       expiresIn: expiresIn ?? '15m',
     });
 
@@ -22,7 +25,7 @@ export class TokenProvider implements ITokenProvider {
 
   encodeHash(token: string): string {
     try {
-      const { sub } = jwt.verify(token, authConfig.secret_token) as unknown as ITokenPayload;
+      const { sub } = jwt.verify(token, authConfig.public_token) as unknown as ITokenPayload;
 
       return sub;
     } catch (err) {

@@ -15,7 +15,14 @@ export class UsersTokensRepositoryInMemory implements IUsersTokensRepository {
     return userToken;
   }
 
-  async findByUserId(userId: string): Promise<UserTokens[]> {
-    return this.repository.filter((token) => token.userId === userId);
+  async findByUserIdAndRefreshToken(userId: string, refreshToken: string): Promise<UserTokens> {
+    return this.repository
+      .find((userToken) => userToken.userId === userId && userToken.refreshToken === refreshToken);
+  }
+
+  async remove(id: string): Promise<void> {
+    const clrRepo = this.repository.filter((userToken) => userToken.id !== id);
+
+    this.repository = [...clrRepo];
   }
 }

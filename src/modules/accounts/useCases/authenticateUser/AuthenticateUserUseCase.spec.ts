@@ -70,17 +70,20 @@ describe('Authenticate User', () => {
     tokenProviderMock.createHash.mockReturnValue(token);
     dateProviderMock.addDays.mockReturnValue(new Date());
 
-    await authenticateUserUseCase.execute({
+    const authData = await authenticateUserUseCase.execute({
       email: data.email,
       password: data.password,
     });
 
     const user = await usersRepository.findByEmail(data.email);
 
-    const refreshToken = await usersTokensRepository.findByUserId(user.id);
+    const refreshToken = await usersTokensRepository.findByUserIdAndRefreshToken(
+      user.id,
+      authData.token,
+    );
 
-    expect(refreshToken[0]).toHaveProperty('id');
-    expect(refreshToken[0].refreshToken).toEqual(token);
+    expect(refreshToken).toHaveProperty('id');
+    expect(refreshToken.refreshToken).toEqual(token);
   });
 
   it('Should be call encrypt provider with correct values', async () => {

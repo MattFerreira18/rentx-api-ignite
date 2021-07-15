@@ -50,7 +50,11 @@ class AuthenticateUserUseCase {
       throw new IncorrectEmailOrPassword();
     }
 
-    const refreshToken = this.tokenProvider.createHash(email, '30d');
+    const refreshToken = this.tokenProvider.createHash({
+      data: user.id,
+      isRefreshToken: true,
+      expiresIn: '30d',
+    });
 
     const refreshTokenExpiresDate = this.dateProvider.addDays(30);
 
@@ -60,7 +64,10 @@ class AuthenticateUserUseCase {
       userId: user.id,
     });
 
-    const token = this.tokenProvider.createHash(user.id);
+    const token = this.tokenProvider.createHash({
+      data: user.id,
+      isRefreshToken: false,
+    });
 
     return { user: { name: user.name, email: user.email }, token, refreshToken };
   }

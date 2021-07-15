@@ -28,10 +28,20 @@ export class UsersTokensRepository implements IUsersTokensRepository {
     return userToken;
   }
 
-  async findByUserId(userId: string): Promise<UserTokens[]> {
+  async findByUserIdAndRefreshToken(userId: string, refreshToken: string): Promise<UserTokens> {
     return this.repository
       .createQueryBuilder()
       .where('user_id = :userId', { userId })
-      .getMany();
+      .andWhere('refresh_token = :refreshToken', { refreshToken })
+      .getOne();
+  }
+
+  async remove(id: string): Promise<void> {
+    await this.repository
+      .createQueryBuilder()
+      .delete()
+      .from(UserTokens)
+      .where('id = :id', { id })
+      .execute();
   }
 }
