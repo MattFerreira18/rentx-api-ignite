@@ -11,6 +11,10 @@ interface IDate {
 }
 
 export class DateProvider implements IDateProvider {
+  addDays(days: number): Date {
+    return dayjs().add(days, 'days').toDate();
+  }
+
   convertToUTC(date: Date): string {
     return dayjs(date).utc().local().format();
   }

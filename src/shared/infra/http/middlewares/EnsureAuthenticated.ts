@@ -1,14 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
 
 import { AppError } from '@errors/AppError';
 import { UsersRepository } from '@modules/accounts/infra/database/repositories/UsersRepository';
-
-interface IPayload {
-  iat: string;
-  exp: string;
-  sub: string;
-}
+import { TokenProvider } from '@src/shared/providers/tokenProvider/TokenProvider';
 
 export async function ensureAuthenticated(
   req: Request,
@@ -23,8 +17,10 @@ export async function ensureAuthenticated(
 
   const [, token] = authorization.split(' ');
 
+  const tokenProvider = new TokenProvider();
+
   try {
-    const { sub: userId } = jwt.verify(token, 'ooifhhsogh') as IPayload;
+    const userId = tokenProvider.encodeHash(token);
 
     const usersRepository = new UsersRepository();
 
@@ -43,43 +39,3 @@ export async function ensureAuthenticated(
     throw new AppError({ statusCode: 401, message: 'invalid token' });
   }
 }
-
-// @injectable()
-// class EnsureAuthenticated {
-//   constructor(
-//     @inject('UsersRepository')
-//     private usersRepository: IUsersRepository
-//   ) {}
-
-//   async verify(req: Request, res: Response, next: NextFunction): Promise<void> {
-//     const { authorization } = req.headers;
-
-//     if (!authorization) {
-//       throw new Error('authorization not found');
-//     }
-
-//     const [, token] = authorization.split(' ');
-
-//     try {
-//       const { sub: userId } = jwt.verify(token, 'ooifhhsogh') as IPayload;
-//       console.log(userId);
-//       // const usersRepository = new UsersRepository();
-
-//       const user = await this.usersRepository.findById(userId);
-//       console.log(user);
-//       if (!user) {
-//         throw new Error('user does not exists');
-//       }
-
-//       // req.userId = userId;
-
-//       next();
-//     } catch (err) {
-//       throw new Error('invalid token');
-//     }
-//   }
-// }
-
-// const ensureAuthenticated = container.resolve(EnsureAuthenticated);
-
-// export { ensureAuthenticated };

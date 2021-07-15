@@ -14,6 +14,8 @@ import { ICategoriesRepository } from '@modules/cars/repositories/ICategoriesRep
 import { ISpecificationsRepository } from '@modules/cars/repositories/ISpecificationsRepository';
 import { RentalsRepository } from '@modules/rentals/infra/database/repositories/RentalsRepository';
 import { IRentalsRepository } from '@modules/rentals/repositories/IRentalsRepository';
+import { UsersTokensRepository } from '@src/modules/accounts/infra/database/repositories/UsersTokensRepository';
+import { IUsersTokensRepository } from '@src/modules/accounts/repositories/IUsersTokensRepository';
 
 // insert <Interface>, rename she and add implementation
 container.registerSingleton<ICategoriesRepository>(
@@ -41,4 +43,9 @@ container.registerSingleton<ICarsImagesRepository>(
 container.registerSingleton<IRentalsRepository>(
   'RentalsRepository',
   RentalsRepository,
+);
+
+container.registerSingleton<IUsersTokensRepository>(
+  'UsersTokensRepository',
+  UsersTokensRepository,
 );

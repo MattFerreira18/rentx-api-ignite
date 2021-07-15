@@ -2,19 +2,24 @@ import { mock } from 'jest-mock-extended';
 
 import { IEncryptsProvider } from '@providers/encryptsProviders/IEncryptsProvider';
 import { ITokenProvider } from '@providers/tokenProvider/ITokenProvider';
+import { IDateProvider } from '@src/shared/providers/dateProvider/IDateProvider';
 
 import { ICreateUserDTO } from '../../dtos/IUserDTO';
 import { IncorrectEmailOrPassword } from '../../errors/IncorrectEmailOrPassword';
 import { UsersRepositoryInMemory } from '../../repositories/inMemory/UsersRepositoryInMemory';
+import { UsersTokensRepositoryInMemory } from '../../repositories/inMemory/UsersTokensRepositoryImMemory';
 import { IUsersRepository } from '../../repositories/IUsersRepository';
+import { IUsersTokensRepository } from '../../repositories/IUsersTokensRepository';
 import { AuthenticateUserUseCase } from './AuthenticateUserUseCase';
 
 describe('Authenticate User', () => {
   let usersRepository: IUsersRepository;
+  let usersTokensRepository: IUsersTokensRepository;
   let authenticateUserUseCase: AuthenticateUserUseCase;
 
   const tokenProviderMock = mock<ITokenProvider>();
   const encryptsProviderMock = mock<IEncryptsProvider>();
+  const dateProviderMock = mock<IDateProvider>();
   const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
 
   const data: ICreateUserDTO = {
@@ -26,10 +31,13 @@ describe('Authenticate User', () => {
 
   beforeEach(async () => {
     usersRepository = new UsersRepositoryInMemory();
+    usersTokensRepository = new UsersTokensRepositoryInMemory();
     authenticateUserUseCase = new AuthenticateUserUseCase(
       usersRepository,
+      usersTokensRepository,
       tokenProviderMock,
       encryptsProviderMock,
+      dateProviderMock,
     );
 
     await usersRepository.create(data);
@@ -43,6 +51,7 @@ describe('Authenticate User', () => {
 
     encryptsProviderMock.compare.mockResolvedValue(true);
     tokenProviderMock.createHash.mockReturnValue(token);
+    dateProviderMock.addDays.mockReturnValue(new Date());
 
     const auth = await authenticateUserUseCase.execute({
       email: data.email,
@@ -56,11 +65,30 @@ describe('Authenticate User', () => {
     expect(auth.user).toEqual(user);
   });
 
+  it('Should be save the refresh user token in repository', async () => {
+    encryptsProviderMock.compare.mockResolvedValue(true);
+    tokenProviderMock.createHash.mockReturnValue(token);
+    dateProviderMock.addDays.mockReturnValue(new Date());
+
+    await authenticateUserUseCase.execute({
+      email: data.email,
+      password: data.password,
+    });
+
+    const user = await usersRepository.findByEmail(data.email);
+
+    const refreshToken = await usersTokensRepository.findByUserId(user.id);
+
+    expect(refreshToken[0]).toHaveProperty('id');
+    expect(refreshToken[0].refreshToken).toEqual(token);
+  });
+
   it('Should be call encrypt provider with correct values', async () => {
     const { password } = await usersRepository.findByEmail(data.email);
 
     encryptsProviderMock.compare.mockResolvedValue(true);
     tokenProviderMock.createHash.mockReturnValue(token);
+    dateProviderMock.addDays.mockReturnValue(new Date());
 
     await authenticateUserUseCase.execute({
       email: data.email,
@@ -72,18 +100,30 @@ describe('Authenticate User', () => {
   });
 
   it('Should be call token provider with correct values', async () => {
-    const { id } = await usersRepository.findByEmail(data.email);
-
     encryptsProviderMock.compare.mockResolvedValue(true);
     tokenProviderMock.createHash.mockReturnValue(token);
+    dateProviderMock.addDays.mockReturnValue(new Date());
 
     await authenticateUserUseCase.execute({
       email: data.email,
       password: data.password,
     });
 
-    expect(tokenProviderMock.createHash).toBeCalledTimes(1);
-    expect(tokenProviderMock.createHash).toBeCalledWith(id);
+    expect(tokenProviderMock.createHash).toBeCalledTimes(2);
+  });
+
+  it('Should be call date provider with correct values', async () => {
+    encryptsProviderMock.compare.mockResolvedValue(true);
+    tokenProviderMock.createHash.mockReturnValue(token);
+    dateProviderMock.addDays.mockReturnValue(new Date());
+
+    await authenticateUserUseCase.execute({
+      email: data.email,
+      password: data.password,
+    });
+
+    expect(dateProviderMock.addDays).toBeCalledTimes(1);
+    expect(dateProviderMock.addDays).toBeCalledWith(30);
   });
 
   it('Should not be able to authenticate an nonexistent user', () => {

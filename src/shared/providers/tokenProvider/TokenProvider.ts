@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 
+import authConfig from '@configs/auth';
 import { AppError } from '@src/shared/errors/AppError';
 
 import { ITokenProvider } from './ITokenProvider';
@@ -12,8 +13,8 @@ interface ITokenPayload {
 
 export class TokenProvider implements ITokenProvider {
   createHash(data: string, expiresIn?: string): string {
-    const token = jwt.sign({ sub: data }, process.env.SECRET_KEY, {
-      expiresIn: expiresIn ?? '1d',
+    const token = jwt.sign({ sub: data ?? authConfig.public_token }, authConfig.secret_token, {
+      expiresIn: expiresIn ?? '15m',
     });
 
     return token;
@@ -21,7 +22,7 @@ export class TokenProvider implements ITokenProvider {
 
   encodeHash(token: string): string {
     try {
-      const { sub } = jwt.verify(token, process.env.SECRET_KEY) as ITokenPayload;
+      const { sub } = jwt.verify(token, authConfig.secret_token) as unknown as ITokenPayload;
 
       return sub;
     } catch (err) {
