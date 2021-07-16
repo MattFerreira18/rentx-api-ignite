@@ -36,6 +36,13 @@ export class UsersTokensRepository implements IUsersTokensRepository {
       .getOne();
   }
 
+  async findByToken(token: string): Promise<UserTokens> {
+    return this.repository
+      .createQueryBuilder()
+      .where('refresh_token = :token', { token })
+      .getOne();
+  }
+
   async remove(id: string): Promise<void> {
     await this.repository
       .createQueryBuilder()

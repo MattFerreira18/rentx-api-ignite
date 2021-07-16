@@ -20,6 +20,10 @@ export class UsersTokensRepositoryInMemory implements IUsersTokensRepository {
       .find((userToken) => userToken.userId === userId && userToken.refreshToken === refreshToken);
   }
 
+  async findByToken(token: string): Promise<UserTokens> {
+    return this.repository.find((userToken) => userToken.refreshToken === token);
+  }
+
   async remove(id: string): Promise<void> {
     const clrRepo = this.repository.filter((userToken) => userToken.id !== id);
 
