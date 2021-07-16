@@ -8,5 +8,6 @@ export interface IDateProvider {
   compareInHours(data: IDate): number;
   compareInDays(startDate: Date, endDate: Date): number;
   addDays(days: number): Date;
+  addHours(hours: number): Date;
   dateNow(): Date;
 }
