@@ -2,6 +2,15 @@ export default {
   bail: false,
   clearMocks: true,
   coverageProvider: 'v8',
+  collectCoverage: true,
+  collectCoverageFrom: [
+    '<rootDir>/src/modules/**/useCases/**/**/*.ts',
+  ],
+  coverageDirectory: 'coverage',
+  coverageReporters: [
+    'lcov',
+    'text-summary',
+  ],
   preset: 'ts-jest',
   testMatch: ['**/*.spec.ts', '**/*.test.ts'],
   moduleNameMapper: {
