@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 
 import { AppError } from '@errors/AppError';
 import { UsersRepository } from '@modules/accounts/infra/database/repositories/UsersRepository';
-import { UsersTokensRepository } from '@src/modules/accounts/infra/database/repositories/UsersTokensRepository';
 import { TokenProvider } from '@src/shared/providers/tokenProvider/TokenProvider';
 
 export async function ensureAuthenticated(
@@ -19,15 +18,15 @@ export async function ensureAuthenticated(
   const [, token] = authorization.split(' ');
 
   const tokenProvider = new TokenProvider();
-  const usersTokensRepository = new UsersTokensRepository();
-
+  const usersRepository = new UsersRepository();
+  // const usersTokensRepository = new UsersTokensRepository();
   try {
     const userId = tokenProvider.encodeHash(token);
 
-    const userToken = await usersTokensRepository.findByUserIdAndRefreshToken(userId, token);
+    const user = await usersRepository.findById(userId);
 
-    if (!userToken) {
-      throw new AppError({ statusCode: 401, message: 'user token does not exists' });
+    if (!user) {
+      throw new AppError({ statusCode: 409, message: 'user not found' });
     }
 
     req.user = {

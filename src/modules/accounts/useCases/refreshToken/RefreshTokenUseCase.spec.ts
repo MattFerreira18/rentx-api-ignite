@@ -39,9 +39,15 @@ describe('refresh token use case', () => {
     dateProviderMock.addDays.mockReturnValue(new Date());
 
     const newToken = await refreshTokenUseCase.execute(token);
-    const refreshToken = await usersTokensRepository.findByUserIdAndRefreshToken(userId, newToken);
+    const refreshToken = await usersTokensRepository.findByUserIdAndRefreshToken(
+      userId,
+      newToken.refreshToken,
+    );
 
-    expect(newToken).toEqual(secondToken);
+    expect(newToken).toEqual({
+      refreshToken: secondToken,
+      token: secondToken,
+    });
     expect(refreshToken).toHaveProperty('id');
   });
 
@@ -52,7 +58,7 @@ describe('refresh token use case', () => {
 
     await refreshTokenUseCase.execute(token);
 
-    expect(tokenProviderMock.createHash).toBeCalledTimes(1);
+    expect(tokenProviderMock.createHash).toBeCalledTimes(2);
     expect(tokenProviderMock.createHash).toBeCalledWith({
       data: userId,
       isRefreshToken: true,

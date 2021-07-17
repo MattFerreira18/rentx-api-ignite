@@ -1,11 +1,15 @@
 import { inject, injectable } from 'tsyringe';
 
-import { AppError } from '@src/shared/errors/AppError';
 import { IDateProvider } from '@src/shared/providers/dateProvider/IDateProvider';
 import { ITokenProvider } from '@src/shared/providers/tokenProvider/ITokenProvider';
 
 import { RefreshTokenNotFound } from '../../errors/RefreshTokenNotFound';
 import { IUsersTokensRepository } from '../../repositories/IUsersTokensRepository';
+
+interface ITokenResponse {
+  refreshToken: string;
+  token: string;
+}
 
 @injectable()
 export class RefreshTokenUseCase {
@@ -18,7 +22,7 @@ export class RefreshTokenUseCase {
     private dateProvider: IDateProvider,
   ) {}
 
-  async execute(token: string): Promise<string> {
+  async execute(token: string): Promise<ITokenResponse> {
     const userId = this.tokenProvider.encodeHash(token);
 
     const refreshToken = await this.usersTokensRepository.findByUserIdAndRefreshToken(
@@ -32,6 +36,10 @@ export class RefreshTokenUseCase {
 
     await this.usersTokensRepository.remove(refreshToken.id);
 
+    const newToken = this.tokenProvider.createHash({
+      data: userId,
+      isRefreshToken: false,
+    });
     const newRefreshToken = this.tokenProvider.createHash({
       data: userId,
       isRefreshToken: true,
@@ -46,6 +54,9 @@ export class RefreshTokenUseCase {
       userId,
     });
 
-    return newRefreshToken;
+    return {
+      refreshToken: newRefreshToken,
+      token: newToken,
+    };
   }
 }
