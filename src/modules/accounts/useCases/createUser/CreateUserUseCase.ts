@@ -1,6 +1,5 @@
 import { inject, injectable } from 'tsyringe';
 
-import { AppError } from '@errors/AppError';
 import { IEncryptsProvider } from '@providers/encryptsProviders/IEncryptsProvider';
 
 import { ICreateUserDTO } from '../../dtos/IUserDTO';

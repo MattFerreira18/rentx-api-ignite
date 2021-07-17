@@ -11,8 +11,8 @@ describe('list all users use case', () => {
     listAllUsersUseCase = new ListAllUsersUseCase(usersRepository);
 
     usersRepository.create({
-      name: 'Matheus',
-      email: 'matheus@email.com',
+      name: 'Kyle Glover',
+      email: 'kyle@email.com',
       driverLicense: '123456',
       password: '123456789',
     });
@@ -25,8 +25,8 @@ describe('list all users use case', () => {
     });
 
     usersRepository.create({
-      name: 'Elisa',
-      email: 'elisa@email.com',
+      name: 'Allie Conner',
+      email: 'allie@email.com',
       driverLicense: '5184809',
       password: '123456789',
     });

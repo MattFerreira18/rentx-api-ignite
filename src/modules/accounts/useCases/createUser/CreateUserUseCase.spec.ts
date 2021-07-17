@@ -14,10 +14,10 @@ describe('create user use case', () => {
 
   const encryptsProviderMock = mock<IEncryptsProvider>();
   const data: ICreateUserDTO = {
-    name: 'Matheus',
-    email: 'matheus@email.com',
-    driverLicense: '123456',
-    password: '123456789',
+    name: 'Luis Keller',
+    email: 'luis@email.com',
+    driverLicense: '392193112898',
+    password: '80195009',
   };
 
   beforeEach(() => {

@@ -23,10 +23,10 @@ describe('Authenticate User', () => {
   const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
 
   const data: ICreateUserDTO = {
-    name: 'Matheus',
-    email: 'matheus@email.com',
-    driverLicense: '123456',
-    password: '123456789',
+    name: 'Jeremiah Berry',
+    email: 'jeremiah@email.com',
+    driverLicense: '643441058070',
+    password: '81389536',
   };
 
   beforeEach(async () => {
@@ -132,8 +132,8 @@ describe('Authenticate User', () => {
   it('Should not be able to authenticate an nonexistent user', () => {
     expect(async () => {
       await authenticateUserUseCase.execute({
-        email: 'email@email.com',
-        password: '123456',
+        email: 'lokolsag@zif.bf',
+        password: '27543991',
       });
     }).rejects.toBeInstanceOf(IncorrectEmailOrPassword);
   });
@@ -144,7 +144,7 @@ describe('Authenticate User', () => {
     expect(async () => {
       await authenticateUserUseCase.execute({
         email: data.email,
-        password: '010101',
+        password: '49995551',
       });
     }).rejects.toBeInstanceOf(IncorrectEmailOrPassword);
   });

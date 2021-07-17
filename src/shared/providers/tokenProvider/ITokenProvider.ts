@@ -7,4 +7,5 @@ export interface ICreateToken {
 export interface ITokenProvider {
   createHash(data: ICreateToken): string;
   encodeHash(token: string): string;
+  createUUIDV4(): string;
 }

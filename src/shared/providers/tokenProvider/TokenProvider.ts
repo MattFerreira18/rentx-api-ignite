@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { v4 as uuid } from 'uuid';
 
 import authConfig from '@configs/auth';
 import { AppError } from '@src/shared/errors/AppError';
@@ -12,6 +13,10 @@ interface ITokenPayload {
 }
 
 export class TokenProvider implements ITokenProvider {
+  createUUIDV4(): string {
+    return uuid();
+  }
+
   createHash({ data, isRefreshToken, expiresIn }: ICreateToken): string {
     const token = jwt.sign({ sub: data }, (
       isRefreshToken

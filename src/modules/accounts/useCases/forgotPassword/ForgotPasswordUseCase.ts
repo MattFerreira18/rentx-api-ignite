@@ -4,6 +4,7 @@ import { v4 as uuid } from 'uuid';
 
 import { IDateProvider } from '@shared/providers/dateProvider/IDateProvider';
 import { IEmailProvider } from '@src/shared/providers/emailProvider/IEmailProvider';
+import { ITokenProvider } from '@src/shared/providers/tokenProvider/ITokenProvider';
 
 import { UserNotFound } from '../../errors/UserNotFound';
 import { IUsersRepository } from '../../repositories/IUsersRepository';
@@ -20,6 +21,8 @@ export class ForgotPasswordUseCase {
     private emailProvider: IEmailProvider,
     @inject('DateProvider')
     private dateProvider: IDateProvider,
+    @inject('TokenProvider')
+    private tokenProvider: ITokenProvider,
 
   ) {}
 
@@ -30,7 +33,7 @@ export class ForgotPasswordUseCase {
       throw new UserNotFound();
     }
 
-    const token = uuid();
+    const token = this.tokenProvider.createUUIDV4();
     const expiresTokenDate = this.dateProvider.addHours(3);
 
     await this.usersTokensRepository.create({
