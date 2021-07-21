@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   database:
-    image: postgres
+    image: "postgres:alpine"
     container_name: database_rentx
     restart: always
     ports:

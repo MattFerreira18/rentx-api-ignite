@@ -19,7 +19,7 @@ export async function ensureAuthenticated(
 
   const tokenProvider = new TokenProvider();
   const usersRepository = new UsersRepository();
-  // const usersTokensRepository = new UsersTokensRepository();
+
   try {
     const userId = tokenProvider.encodeHash(token);
 

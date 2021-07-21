@@ -1,3 +1,5 @@
+import { classToClass } from 'class-transformer';
+
 import { IListUserDTO } from '../dtos/IUserDTO';
 import User from '../infra/database/entities/User';
 
@@ -9,15 +11,20 @@ export class UserMapper {
     avatar,
     isAdmin,
     driverLicense,
+    avatarUrl,
     password,
     createdAt,
   }: User): IListUserDTO {
-    return {
+    const user = classToClass({
       id,
       name,
       email,
+      avatar,
       driverLicense,
       isAdmin,
-    };
+      avatarUrl,
+    });
+
+    return user;
   }
 }

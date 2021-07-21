@@ -28,9 +28,13 @@ export class TokenProvider implements ITokenProvider {
     return token;
   }
 
-  encodeHash(token: string): string {
+  encodeHash(token: string, isRefreshToken?: boolean): string {
     try {
-      const { sub } = jwt.verify(token, authConfig.public_token) as unknown as ITokenPayload;
+      const { sub } = jwt.verify(token, (
+        isRefreshToken
+          ? authConfig.public_token
+          : authConfig.secret_token
+      )) as unknown as ITokenPayload;
 
       return sub;
     } catch (err) {

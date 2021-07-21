@@ -9,6 +9,8 @@ interface IListUserDTO {
   id: string;
   name: string;
   email: string;
+  avatar: string;
+  avatarUrl(): string;
   driverLicense: string;
   isAdmin: boolean;
 }

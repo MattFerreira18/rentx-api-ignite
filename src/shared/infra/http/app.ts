@@ -1,10 +1,12 @@
-import express from 'express';
-import swagger from 'swagger-ui-express';
-
 import 'dotenv/config';
 import 'reflect-metadata';
 import '../../containers';
 import 'express-async-errors';
+
+import express from 'express';
+import swagger from 'swagger-ui-express';
+
+import upload from '@configs/upload';
 
 import swaggerConfig from '../../../swagger.json';
 // import '../database';
@@ -19,6 +21,8 @@ const app = express();
 
 app
   .use(express.json())
+  .use('/avatar', express.static(`${upload.tmpFolder}/avatar`))
+  .use('/cars', express.static(`${upload.tmpFolder}/cars`))
   .use('/api-docs', swagger.serve, swagger.setup(swaggerConfig))
   .use(router.authenticate)
   .use('/categories', router.categories)

@@ -1,6 +1,7 @@
+import aws from 'aws-sdk';
 import fs from 'fs';
 import handlebars from 'handlebars';
-import nodemailer, { Transporter } from 'nodemailer';
+import { createTransport, Transporter } from 'nodemailer';
 
 import { IEmailProvider } from './IEmailProvider';
 
@@ -8,19 +9,11 @@ export class EmailProvider implements IEmailProvider {
   private client: Transporter;
 
   constructor() {
-    nodemailer.createTestAccount().then((account) => {
-      const transporter = nodemailer.createTransport({
-        host: account.smtp.host,
-        port: account.smtp.port,
-        secure: account.smtp.secure,
-        auth: {
-          user: account.user,
-          pass: account.pass,
-        },
-      });
-      this.client = transporter;
-    }).catch((err) => {
-      console.error(err);
+    this.client = createTransport({
+      SES: new aws.SES({
+        apiVersion: '2018-02-01',
+        region: process.env.AWS_REGION,
+      }),
     });
   }
 
@@ -29,14 +22,11 @@ export class EmailProvider implements IEmailProvider {
     const templateParse = handlebars.compile(templateFileContent);
     const templateHTML = templateParse(variables);
 
-    const message = await this.client.sendMail({
+    await this.client.sendMail({
       to,
       from: 'Rentx <noreplay@rentx.com.br>',
       subject,
       html: templateHTML,
     });
-
-    console.log(message.messageId);
-    console.log(nodemailer.getTestMessageUrl(message));
   }
 }
