@@ -11,6 +11,7 @@ import upload from '@configs/upload';
 
 import swaggerConfig from '../../../swagger.json';
 import createConnection from '../database';
+import { rateLimiter } from './middlewares/rateLimiter';
 import { treatmentExceptions } from './middlewares/treatmentExceptions';
 import { router } from './routes';
 
@@ -22,6 +23,7 @@ const app = express();
 app
   .use(express.json())
   .use(cors())
+  .use(rateLimiter)
   .use('/avatar', express.static(`${upload.tmpFolder}/avatar`))
   .use('/cars', express.static(`${upload.tmpFolder}/cars`))
   .use('/api-docs', swagger.serve, swagger.setup(swaggerConfig))

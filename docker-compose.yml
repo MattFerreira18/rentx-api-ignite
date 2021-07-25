@@ -14,18 +14,24 @@ services:
     volumes:
       - pgdata:/data/postgres
 
-  app:
-    build: .
-    container_name: rentx
-    restart: always
+  redis:
+    image: "redis:alpine"
+    container_name: redis_rentx
     ports:
-      - 5500:5500
-    volumes:
-      - .:/usr/app
-    links:
-      - database
-    depends_on:
-      - database
+      - 6379:6379
+
+  # app:
+  #   build: .
+  #   container_name: rentx
+  #   restart: always
+  #   ports:
+  #     - 5500:5500
+  #   volumes:
+  #     - .:/usr/app
+  #   links:
+  #     - database
+  #   depends_on:
+  #     - database
 
 
 # mapping volumes
