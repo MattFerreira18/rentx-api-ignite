@@ -5,9 +5,9 @@
   "username": "tests",
   "password": "rentx123",
   "database": "rentx",
-  "migrations": ["./src/shared/infra/database/migrations/*.ts"],
-  "entities": ["./src/modules/**/entities/*.ts"],
+  "migrations": ["./dist/shared/infra/database/migrations/*.ts"],
+  "entities": ["./dist/modules/**/entities/*.ts"],
   "cli": {
-    "migrationsDir": "./src/shared/infra/database/migrations"
+    "migrationsDir": "./dist/shared/infra/database/migrations"
   }
 }
