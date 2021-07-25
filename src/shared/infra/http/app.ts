@@ -15,7 +15,7 @@ import swaggerConfig from '../../../swagger.json';
 import createConnection from '../database';
 import { rateLimiter } from './middlewares/rateLimiter';
 import { treatmentExceptions } from './middlewares/treatmentExceptions';
-import { router } from './routes';
+import routes from './routes';
 
 createConnection().then(() => {
   console.log('📦 database was connected with successfully');
@@ -39,13 +39,8 @@ app
   .use(cors())
   .use('/avatar', express.static(`${upload.tmpFolder}/avatar`))
   .use('/cars', express.static(`${upload.tmpFolder}/cars`))
+  .use(routes)
   .use('/api-docs', swagger.serve, swagger.setup(swaggerConfig))
-  .use(router.authenticate)
-  .use('/categories', router.categories)
-  .use('/specifications', router.specifications)
-  .use('/users', router.users)
-  .use('/cars', router.cars)
-  .use('/rentals', router.rentals)
   .use(Sentry.Handlers.errorHandler())
   .use(treatmentExceptions);
 
