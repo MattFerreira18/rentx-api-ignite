@@ -22,6 +22,6 @@ export async function rateLimiter(req: Request, res: Response, next: NextFunctio
 
     return next();
   } catch (err) {
-    throw new AppError({ statusCode: 420, message: 'too many requests' });
+    throw new AppError({ statusCode: 429, message: 'too many requests' });
   }
 }
